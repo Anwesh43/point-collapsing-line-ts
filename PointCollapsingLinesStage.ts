@@ -208,3 +208,25 @@ class PointCollapsingLine {
         this.curr.startUpdating(cb)
     }
 }
+
+class Renderer {
+
+    pcl : PointCollapsingLine = new PointCollapsingLine()
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        this.pcl.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.pcl.startUpdating(() => {
+            this.animator.start(() => {
+                cb()
+                this.pcl.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
+    }
+}
