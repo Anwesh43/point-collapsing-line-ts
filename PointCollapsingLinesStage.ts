@@ -36,6 +36,9 @@ class ScaleUtil {
 class DrawingUtil {
 
     static drawLine(context : CanvasRenderingContext2D, x1 : number, y1 : number, x2 : number, y2 : number) {
+        if (x1 == x2 && y1 == y2) {
+            return
+        }
         context.beginPath()
         context.moveTo(x1, y1)
         context.lineTo(x2, y2)
@@ -60,9 +63,12 @@ class DrawingUtil {
         context.lineCap = 'round'
         context.lineWidth = Math.min(w, h) / strokeFactor
         context.strokeStyle = foreColor
+        context.save()
+        context.translate(w / 2, gap * (i + 1))
         for (var j = 0; j < lines; j++) {
             DrawingUtil.drawPointCollapsingLine(context, j, sc1, sc2, size)
         }
+        context.restore()
     }
 }
 
@@ -164,8 +170,8 @@ class PCLNode {
 
     draw(context : CanvasRenderingContext2D) {
         DrawingUtil.drawPCLNode(context, this.i, this.state.scale)
-        if (this.next) {
-            this.next.draw(context)
+        if (this.prev) {
+            this.prev.draw(context)
         }
     }
 
@@ -191,12 +197,11 @@ class PCLNode {
 }
 
 class PointCollapsingLine {
-    root : PCLNode = new PCLNode(0)
-    curr : PCLNode = this.root
+    curr : PCLNode = new PCLNode(0)
     dir : number = 1
 
     draw(context : CanvasRenderingContext2D) {
-        this.root.draw(context)
+        this.curr.draw(context)
     }
 
     update(cb : Function) {
